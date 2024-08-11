@@ -8,6 +8,10 @@ pub enum EmissionShape {
     #[default]
     Point,
     Sphere(f32),
+    HollowSphere {
+        inner_radius: f32,
+        outer_radius: f32,
+    },
     Circle {
         normal: Vec3,
         radius: f32,
@@ -28,6 +32,19 @@ impl EmissionShape {
                 let spherical = PitchYaw::new(u, v);
 
                 spherical.to_unit_vec() * r * (*radius)
+            }
+            Self::HollowSphere {
+                inner_radius,
+                outer_radius,
+            } => {
+                let (u, v, r) = (
+                    rand::random::<f32>() * 2. * PI,
+                    rand::random::<f32>() * PI,
+                    rand::random::<f32>(),
+                );
+                let spherical = PitchYaw::new(u, v);
+
+                spherical.to_unit_vec() * (inner_radius + r * (*outer_radius - *inner_radius))
             }
             Self::Circle { normal, radius } => {
                 let (u, r) = (rand::random::<f32>() * 2. * PI, rand::random::<f32>());
