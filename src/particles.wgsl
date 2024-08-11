@@ -97,8 +97,16 @@ fn fragment(in: VertexOutput, @builtin(front_facing) is_front: bool) -> @locatio
     if firework_uniform.fade_edge > 0. {
         let vec_to_center = in.uv - vec2(0.5, 0.5);
         let dist_to_center = length(vec_to_center) * 2.;
-        let dist_from_edge = clamp(1. - dist_to_center, 0., 1.);
-        let edge_blend = smoothstep(0., firework_uniform.fade_edge, dist_from_edge);
+
+        var edge_blend = 0.0;
+        if dist_to_center < 0.1 {
+            edge_blend = 1.0;
+        } else if dist_to_center < 0.2 {
+            edge_blend = 6.25 * (0.2 - 0.1) + 0.375;
+        } else {
+            edge_blend = (1. - dist_to_center) / 2.0;
+        };
+
         color.a *= edge_blend;
     }
 
